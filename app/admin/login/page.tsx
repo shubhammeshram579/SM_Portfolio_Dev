@@ -13,18 +13,48 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   const res = await signIn("credentials", {
+  //     ...form,
+  //     redirect: false,
+  //   });
+  //   setLoading(false);
+  //   if (res?.ok) {
+  //     router.push("/admin/dashboard");
+  //   } else {
+  //     toast.error("Invalid credentials");
+  //   }
+  // };
+
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (loading) return;
     setLoading(true);
-    const res = await signIn("credentials", {
-      ...form,
-      redirect: false,
-    });
-    setLoading(false);
-    if (res?.ok) {
-      router.push("/admin/dashboard");
-    } else {
-      toast.error("Invalid credentials");
+
+    try {
+      const res = await signIn("credentials", {
+        email: form.email.trim(),
+        password: form.password.trim(),
+        redirect: false,
+      });
+
+      if (res?.ok && !res?.error) {
+        toast.success("Login successful");
+        router.push("/admin/dashboard");
+        router.refresh(); // Syncs NextAuth session state across App Router layout
+      } else {
+        toast.error(res?.error === "CredentialsSignin" ? "Invalid email or password" : "Authentication failed");
+      }
+    } catch (err) {
+      console.error("Login request error:", err);
+      toast.error("Server connection error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
