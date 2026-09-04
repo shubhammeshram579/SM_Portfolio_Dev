@@ -114,6 +114,7 @@ export default function ProjectsSection({ projects, showAll = false }: ProjectsS
             </motion.div>
           ))}
         </div>
+        
 
         {!showAll && (
           <div className="mt-12 text-center">
